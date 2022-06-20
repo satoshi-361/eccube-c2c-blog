@@ -1,0 +1,1 @@
+# eccube-c2c-blog
