@@ -1,0 +1,27 @@
+{#
+ * This file is part of the Recommend Product plugin
+ *
+ * Copyright (C) EC-CUBE CO.,LTD. All Rights Reserved.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+#}
+{% set recommend_products = repository('Plugin\\Recommend4\\Entity\\RecommendProduct').getRecommendProduct %}
+
+<div class="recommend-products">
+    <div class="ec-secHeading">
+        <span class="ec-secHeading__en">おすすめ商品</span>
+    </div>
+  <div class="ec-shelfRole">
+      <ul class="ec-shelfGrid" style="flex-direction: column">
+          {% for RecommendProduct in recommend_products %}
+          {% set Product = RecommendProduct.Product %}
+              <li style="margin-bottom: 20px">
+                  <a href="{{ url('cm_blog_pro_page_detail', {'id': Product.Blog.id}) }}">
+                      <img src="{{ asset(Product.mainFileName|no_image_product, "save_image") }}" alt="{{ Product.name }}">
+                  </a>
+              </li>
+          {% endfor %}
+      </ul>
+  </div>
+</div>

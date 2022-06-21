@@ -1,0 +1,119 @@
+{#
+This file is part of EC-CUBE
+
+Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+
+http://www.ec-cube.co.jp/
+
+For the full copyright and license information, please view the LICENSE
+file that was distributed with this source code.
+#}
+{% extends 'default_frame.twig' %}
+
+{% set mypageno = 'sale' %}
+
+{% set body_class = 'mypage' %}
+
+{% block stylesheet %}
+    <style>
+        thead, th, tr, td {
+            border: 1px solid #ddd;
+        }
+        th,td {
+            padding: 5px;
+            text-align: center;
+        }
+        .div-img-name {
+            display: flex; align-items: center
+        }
+        .ec-imageGrid__img {
+            width: 50%;
+            text-align: center;
+            margin-right: 10px;
+        }
+        .ec-imageGrid__content {
+            width: 50%;
+        }
+        .ec-mypageRole img.blog-img {
+            height: 120px;
+            width: auto;
+        }
+        .ec-mypageRole img.user-img {
+            width: 44px;
+            height: auto;
+            object-fit: contain;
+            border-radius: 22px;
+        }
+
+        @media only screen and (max-width: 768px) {
+            .div-img-name {
+                flex-direction: column;
+            }
+            .ec-mypageRole img.blog-img {
+                width: 100%;
+                height: auto;
+            }
+            .ec-imageGrid__img, .ec-imageGrid__content {
+                width: 100%;
+            }
+        }
+    </style>
+{% endblock stylesheet %}
+
+{% block main %}
+    <div class="ec-layoutRole__main">
+        <div class="ec-mypageRole">
+            <div class="ec-pageHeader">
+                <h1>{{ 'front.mypage.title'|trans }}/{{ 'セールス状況'|trans }}</h1>
+            </div>
+            {% include 'Mypage/navi.twig' %}
+        </div>
+        
+        <h3>今月の合計金額： {{ total_price|price }}</h3>
+
+        <div class="ec-mypageRole">
+            <table>
+                <thead>
+                    <tr>
+                        <th>購入日時</th>
+                        <th>ブログ名</th>
+                        <th>ユーザー名</th>
+                        <th>金額</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for OrderItem in pagination %}
+                        <tr>
+                            <td style="width: 10%"><span> {{ OrderItem.Order.order_date|date_min }} </span></td>
+                            <td style="width: 65%">
+                                <a href="{{ url('cm_blog_pro_page_detail', {id: OrderItem.Product.Blog.id}) }}">
+                                    <div class="div-img-name">
+                                        <div class="ec-imageGrid__img">
+                                            {% if OrderItem.Product.Blog.getMainListImage is null %}
+                                                <img src="{{ asset(''|no_image_product, 'save_image') }}" class="blog-img" />
+                                            {% else %}
+                                                <img src="{{ asset(OrderItem.Product.Blog.getMainListImage|no_image_product, 'save_image') }}" class="blog-img" >
+                                            {% endif %}
+                                        </div>
+                                        <div class="ec-imageGrid__content">
+                                            <p class="ec-historyRole__detailTitle">{{ OrderItem.Product.Blog.title|length > 30 ? OrderItem.Product.Blog.title|striptags|replace({('&nbsp;'):' '})|slice(0, 30)|raw ~ '...' : OrderItem.Product.Blog.title|raw }}</p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </td>
+                            <td style="width: 20%">
+                                <a href="{{ url('customer_detail', { id: OrderItem.Order.Customer.id }) }}" class="user_icon_3YKXP">
+                                    <div class="div-img-name">
+                                        <img src="{{ asset(OrderItem.Order.Customer.image|no_image_product, 'save_image') }}" class="user-img">
+                                        <span> {{ OrderItem.Order.Customer.nickname }} </span>
+                                    </div>
+                                </a>
+                            </td>
+                            <td style="width: 5%"><span> {{ OrderItem.getTotalPrice|price }} </span></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

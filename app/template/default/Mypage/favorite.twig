@@ -1,0 +1,128 @@
+{#
+This file is part of EC-CUBE
+
+Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+
+http://www.ec-cube.co.jp/
+
+For the full copyright and license information, please view the LICENSE
+file that was distributed with this source code.
+#}
+{% extends 'default_frame.twig' %}
+
+{% set mypageno = 'favorite' %}
+
+{% set body_class = 'mypage' %}
+{% set blogRepository = repository('Plugin\\CMBlogPro\\Entity\\Blog') %}
+{% set blogs = blogRepository.findBy({ 'Customer': app.user.id }) %}
+
+{% block stylesheet %}
+    <style>
+        .ec-historyRole .ec-historyRole__detail .ec-historyRole__detailTitle {
+            margin-bottom: 0;
+        }
+
+        .ec-historyRole__contents {
+            align-items: center;
+        }
+
+        .btn-ec-regular {
+            color: #212529;
+            background-color: #FFFFFF;
+            border-color: #595959;
+            color: #595959;
+            cursor: pointer;
+        }
+        .btn-ec-regular:hover {
+            color: #262626;
+            background-color: #F2F2F2;
+            border-color: #262626;
+            text-decoration: none;
+        }
+    </style>
+{% endblock stylesheet %}
+
+{% block main %}
+    <div class="ec-layoutRole__main">
+        <div class="ec-mypageRole">
+            <div class="ec-pageHeader">
+                <h1>{{ 'front.mypage.title'|trans }}/{{ 'front.mypage.nav__favorite'|trans }}</h1>
+            </div>
+            {% include 'Mypage/navi.twig' %}
+        </div>
+
+        <div class="ec-mypageRole">
+            {% for blog in blogs %}
+            <div class="ec-historyRole">
+                {# {% if pagination.totalItemCount > 0 %}
+                    <div class="ec-favoriteRole__header">
+                        <p>{{ 'front.mypage.favorite_count'|trans({'%count%':pagination.totalItemCount}) }}</p>
+                    </div>
+                    <div class="ec-favoriteRole__detail">
+                        <ul class="ec-favoriteRole__itemList">
+                            {% for FavoriteProduct in pagination %}
+                                {% set Product = FavoriteProduct.Product %}
+                                <li class="ec-favoriteRole__item">
+                                    <a class="ec-closeBtn--circle"
+                                       href="{{ url('mypage_favorite_delete', { id : Product.id }) }}" {{ csrf_token_for_anchor() }}
+                                       data-method="delete">
+                                        <div class="ec-icon">
+                                            <img src="{{ asset('assets/icon/cross-white.svg') }}" alt="close">
+                                        </div>
+                                    </a>
+                                    <a class="ec-favoriteRole__itemThumb" href="{{ url('product_detail', {'id': Product.id}) }}">
+                                        <p class="ec-favoriteRole__item-image">
+                                            <img src="{{ asset(Product.main_list_image|no_image_product, 'save_image') }}">
+                                        </p>
+                                    </a>
+                                    <p class="ec-favoriteRole__itemTitle">{{ Product.name }}</p>
+                                    <p class="ec-favoriteRole__itemPrice">
+                                        {% if Product.price02_inc_tax_min == Product.price02_inc_tax_max %}
+                                            {{ Product.price02_inc_tax_min|price }}
+                                        {% else %}
+                                            {{ Product.price02_inc_tax_min|price }}～{{ Product.price02_inc_tax_max|price }}
+                                        {% endif %}
+                                    </p>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="ec-pagerRole">
+                        {% include "pager.twig" with {'pages': pagination.paginationData} %}
+                    </div>
+                {% else %}
+                    <div class="ec-favoriteRole__header">{{ 'front.mypage.favorite_not_found'|trans }}</div>
+                {% endif %} #}
+
+                
+                <div class="ec-historyRole__contents">
+                    <div class="ec-historyRole__header">
+                        <div class="ec-historyListHeader">
+                            <p class="ec-historyListHeader__date">{{ blog.create_date|date_sec }}</p>
+                        </div>
+                    </div>
+                    <div class="ec-historyRole__detail" style="display: flex; align-items: center;">
+                        <div class="ec-imageGrid" style="width: calc(100% - 40px)">
+                            <a href="{{ url('cm_blog_pro_page_detail', {id: blog.id}) }}">
+                                <div class="ec-imageGrid__img">
+                                    {% if blog.getMainListImage is null %}
+                                        <img src="{{ asset(''|no_image_product, 'save_image') }}"/>
+                                    {% else %}
+                                        <img src="{{ asset(blog.getMainListImage|no_image_product, 'save_image') }}">
+                                    {% endif %}
+                                </div>
+                                <div class="ec-imageGrid__content">
+                                    <p class="ec-historyRole__detailTitle">{{ blog.title }}</p>
+                                </div>
+                            </a>
+                        </div>
+                        <div>
+                            <a href="{{ url('cm_blog_pro_edit', {id: blog.id}) }}" class="btn btn-ec-regular">  編集  </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

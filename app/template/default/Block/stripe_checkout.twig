@@ -1,0 +1,12 @@
+<form action="{{ url('shopping_stripe_checkout') }}" method="POST">
+  <script
+    src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+    data-key="pk_test_51L7uTiAA374F9rqHFzq2g34KhO9T3Lvnyyz5Rk9hAvKSjnFLG2nBQjtfREEbHHNdEyxpo7dFPj87JzAp3Jd0XcEO002uxGNnzK"
+    data-amount="{{ Order.payment_total }}"
+    data-email="{{ Order.Customer.email }}"
+    data-allow-remember-me="false"
+    data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+    data-locale="JP"
+    data-currency="JPY">
+  </script>
+</form>

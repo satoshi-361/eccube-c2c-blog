@@ -1,0 +1,356 @@
+{% extends 'default_frame.twig' %}
+
+{% block javascript %}
+    <script>
+        $(function() {
+            $('.add-cart').on('click', function(event) {
+                {% if form.classcategory_id1 is defined %}
+                // 規格1フォームの必須チェック
+                if ($('#classcategory_id1').val() == '__unselected' || $('#classcategory_id1').val() == '') {
+                    $('#classcategory_id1')[0].setCustomValidity('{{ 'front.product.product_class_unselected'|trans }}');
+                    return true;
+                } else {
+                    $('#classcategory_id1')[0].setCustomValidity('');
+                }
+                {% endif %}
+
+                {% if form.classcategory_id2 is defined %}
+                // 規格2フォームの必須チェック
+                if ($('#classcategory_id2').val() == '__unselected' || $('#classcategory_id2').val() == '') {
+                    $('#classcategory_id2')[0].setCustomValidity('{{ 'front.product.product_class_unselected'|trans }}');
+                    return true;
+                } else {
+                    $('#classcategory_id2')[0].setCustomValidity('');
+                }
+                {% endif %}
+
+                // 個数フォームのチェック
+                if ($('#quantity').val() < 1) {
+                    $('#quantity')[0].setCustomValidity('{{ 'front.product.invalid_quantity'|trans }}');
+                    return true;
+                } else {
+                    $('#quantity')[0].setCustomValidity('');
+                }
+
+                event.preventDefault();
+                $form = $('#form1');
+                $.ajax({
+                    url: $form.attr('action'),
+                    type: $form.attr('method'),
+                    data: $form.serialize(),
+                    dataType: 'json',
+                    beforeSend: function(xhr, settings) {
+                        // Buttonを無効にする
+                        $('.add-cart').prop('disabled', true);
+                    }
+                }).done(function(data) {
+                    // レスポンス内のメッセージをalertで表示
+                    $.each(data.messages, function() {
+                        $('#ec-modal-header').html(this);
+                    });
+
+                    $('.ec-modal').show()
+
+                    // カートブロックを更新する
+                    $.ajax({
+                        url: "{{ url('block_cart') }}",
+                        type: 'GET',
+                        dataType: 'html'
+                    }).done(function(html) {
+                        $('.ec-headerRole__cart').html(html);
+                    });
+                }).fail(function(data) {
+                    alert('{{ 'front.product.add_cart_error'|trans }}');
+                }).always(function(data) {
+                    // Buttonを有効にする
+                    $('.add-cart').prop('disabled', false);
+                });
+            });
+        });
+
+        $('.ec-modal-wrap').on('click', function(e) {
+            // モーダル内の処理は外側にバブリングさせない
+            e.stopPropagation();
+        });
+        $('.ec-modal-overlay, .ec-modal, .ec-modal-close, .ec-inlineBtn--cancel').on('click', function() {
+            $('.ec-modal').hide()
+        });
+    </script>
+{% endblock %}
+
+{% block stylesheet %}
+    <link rel="stylesheet" href="{{ asset('assets/css/detail.css') }}">
+    <style>
+        .pluginCMBblog .post_meta {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            width: 95%;
+            margin: 0 auto;
+        }
+        .pluginCMBblog .blog_category{
+            margin: 0;
+            padding: 0;
+        }
+        .pluginCMBblog .blog_category{
+            display: initial;
+        }
+        .pluginCMBblog .blog_category li{
+            display: initial;
+            border-right: 1px solid #ddd;
+        }
+
+        .pluginCMBblog .blog_category li:last-child {
+            border-right: none;
+        }
+
+        .pluginCMBblog .post_meta .post_meta_list{
+            padding-right: 2rem;
+        }
+
+        .pluginCMBblog .list_category_link{
+            color: #337ab7;
+            padding: 0 0.5rem;
+        }
+        .pluginCMBblog .main_image_blog{
+            padding: 3rem 0;
+        }
+
+        .pluginCMBblog .post_meta_list.time{
+            width: 15rem;
+            display: inline-table;
+        }
+        .pluginCMBblog .tag_dl{
+            display: flex;
+        }
+
+        .pluginCMBblog .blog_detail .blog_Title{
+            word-break: break-word;
+            margin-bottom: 20px;
+        }
+        .pluginCMBblog .cm_blog_main_image img{
+            max-width: 100%;
+            width: auto;
+        }
+        ul.tag-ul {
+            padding-left:8px;
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        ul.tag-ul > li {
+            margin: 0.4em;
+            padding: 0 0.8em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        ul.tag-ul > li > a:hover {
+            text-decoration: none;
+        }
+        h3.tag-header {
+        padding: 1rem 2rem;
+        border-left: 4px solid #000;
+        }
+        .w-100 {
+            width: 100%
+        }
+        .side-bar > div {
+            width: 90%;
+            margin:40px auto;
+        }
+        h5.tag-header {
+        padding: 1rem 2rem;
+        border-left: 4px solid #000;
+        }
+        .month-archive a {
+            text-decoration: underline;
+            display: block;
+            padding: 3px 27px;
+        }
+        .ec-productRole__description > p img {
+            width: calc(var(--width));
+            margin-bottom: 15px;
+        }
+        .archive-link-div {
+            max-height: 600px;
+            overflow-y: scroll;
+        }
+        .archive-link-div::-webkit-scrollbar {
+            display: none;
+        }
+        @media screen and (max-width: 768px){
+            .pluginCMBblog .post_meta {
+                display: block;
+            }
+            
+            .pluginCMBblog .post_meta_list.time{
+                width: 100%;
+            }
+            .side-bar > div {
+                width: 100%
+            }
+        }
+        @media only screen and (min-width: 768px) {
+            .ec-shelfGrid .ec-shelfGrid__item-image {
+                height: 150px;
+            }
+            h3.tag-header {
+                margin: 63px 16px 20px;
+            }
+            .side-bar {
+                width: 280px;
+                background-color: #f6f6f6;
+            }
+            // .ec-role {
+            //     display: flex;
+            //     justify-content: flex-start
+            // }
+            .mt-65 {
+                margin-top: 65px!important;
+            }
+        }
+
+        .rate_container_3b3bv .star {
+            color: #ffbb00;
+        }
+        
+        .v-divider {
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+    </style>
+{% endblock %}
+
+{% block main %}
+    <div class="ec-role blog_detail pluginCMBblog">
+        <div class="w-100">
+            <div id="article" class="layout column">
+                <div class="eyecatch_32B-k">
+                    {% if blog.getMainListImage %}
+                    <img src="{{ asset(blog.getMainListImage|no_image_product, 'save_image') }}" class='selected_1J9Uw'></img>
+                    {% else %}
+                    <img src="{{ asset(''|no_image_product, 'save_image') }}" class='selected_1J9Uw'></img>
+                    {% endif %}
+                </div>
+
+                <div class="container column">
+                    <div class="layout column main_1kalt">
+                        <div class="title_1vAoh">{{ blog.title }}</div>
+                        <div class="user_infomation_29_Yb">
+                            <div class="user_container_3NE7G">
+                                <a href="{{ url('customer_detail', { id: blog.Customer.id }) }}" class="nuxt-link-active user_icon_SDrmZ">
+                                    <img src="{{ asset(blog.Customer.image|no_image_product, 'save_image') }}" class="icon_image_1Zfe-">
+                                </a>
+                                <div class="user_info_LdfYV">
+                                    <div class="name_xWDud">
+                                        <a href="#" class="nuxt-link-active writer_name_26NZ1">{{ blog.Customer.name01 ~ blog.Customer.name02 }}</a>
+                                    </div>
+                                    <div class="date_3UBgt">
+                                        {% set datePost = blog.create_date|date('d-m-Y') %} 
+                                        {% set today = "now"|date('d-m-Y') %} 
+                                        {% set difference = date(today).diff(date(datePost)) %} 
+                                        {% set leftDays = difference.days %} 
+
+                                        {% if datePost == today %} 今日 {% else %} {{ leftDays }}日前 {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="spacer"></div>
+                            <div>
+
+                                <form action="{{ url('product_add_cart', {id:Product.id}) }}" method="post" id="form1" name="form1">
+                                    {% if Product.stock_find %}
+                                        <div class="ec-productRole__actions">
+                                            {% if form.classcategory_id1 is defined %}
+                                                <div class="ec-select">
+                                                    {{ form_widget(form.classcategory_id1) }}
+                                                    {{ form_errors(form.classcategory_id1) }}
+                                                </div>
+                                                {% if form.classcategory_id2 is defined %}
+                                                    <div class="ec-select">
+                                                        {{ form_widget(form.classcategory_id2) }}
+                                                        {{ form_errors(form.classcategory_id2) }}
+                                                    </div>
+                                                {% endif %}
+                                            {% endif %}
+                                            <div class="ec-numberInput" style="display: none"><span>{{ 'common.quantity'|trans }}</span>
+                                                {{ form_widget(form.quantity) }}
+                                                {{ form_errors(form.quantity) }}
+                                            </div>
+                                        </div>
+                                        <div class="ec-productRole__btn">
+                                            {# <button type="submit" class="ec-blockBtn--action add-cart">
+                                                {{ 'front.product.add_cart'|trans }}
+                                            </button> #}
+
+                                            <button type="button" type="submit" class="add-cart white--text font-weight-bold v-btn v-btn--depressed theme--light v-size--default purchase_button_gGtHe" style="background-color:#F96204;border-color:#F96204;">
+                                                <span class="v-btn__content" style="color: white">{{ blog.price02|price }}</span>
+                                            </button>
+                                        </div>
+                                    {% else %}
+                                        <div class="ec-productRole__btn">
+                                            <button type="button" class="white--text font-weight-bold v-btn v-btn--depressed theme--light v-size--default purchase_button_gGtHe" disabled="disabled"  style="background-color:#F96204;border-color:#F96204;">
+                                                {{ 'front.product.out_of_stock'|trans }}
+                                            </button>
+                                        </div>
+                                    {% endif %}
+
+                                    {{ form_rest(form) }}
+                                </form>
+
+                                <div role="dialog" class="v-dialog__container">
+
+                                </div>
+                                <div role="dialog" class="v-dialog__container">
+
+                                </div>
+                            </div>
+                        </div>
+                        <hr role="separator" aria-orientation="horizontal" class="v-divider theme--light">
+                        <div class="article_infomation_2y7Xh">
+                            <div class="affiliate_container_3ab-c">
+                                <span class="introduce_text_KoEmC">この記事の紹介料</span>
+                                <span class="number_5cn3Z">{{ blog.Customer.affiliate }}</span>
+                                <span class="percentage_3yb8b">%</span>
+                            </div>
+                            <hr role="separator" aria-orientation="vertical" class="v-divider v-divider--vertical theme--light divider_26E5m">
+                            <div class="rate_container_3b3bv">
+                                <div class="header_2Z-bz">平均スコア</div>
+                            </div>
+                        </div>
+                        <div class="sales_count_infomation_3mXQz">
+                            <div class="sales_count_container_ZdqBa">
+                                {% if blog.stock_unlimited %}
+                                    部数制限なし
+                                {% else %}
+                                    残り{{ blog.stock }}部
+                                {% endif %}
+                            </div>
+                        </div>
+                        <hr role="separator" aria-orientation="horizontal" class="v-divider theme--light">
+                        <div class="layout body column body_3Jd9t">
+                            <div class="ec-productRole__description">{{ blog.body|raw }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="ec-modal">
+                <div class="ec-modal-overlay">
+                    <div class="ec-modal-wrap">
+                        <span class="ec-modal-close"><span class="ec-icon"><img src="{{ asset('assets/icon/cross-dark.svg') }}" alt=""/></span></span>
+                        <div id="ec-modal-header" class="text-center">{{ 'front.product.add_cart_complete'|trans }}</div>
+                        <div class="ec-modal-box">
+                            <div class="ec-role">
+                                <span class="ec-inlineBtn--cancel">{{ 'front.product.continue'|trans }}</span>
+                                <a href="{{ url('cart') }}" class="ec-inlineBtn--action">{{ 'common.go_to_cart'|trans }}</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

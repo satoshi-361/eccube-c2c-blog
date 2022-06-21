@@ -1,0 +1,253 @@
+{#
+This file is part of EC-CUBE
+
+Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
+
+http://www.ec-cube.co.jp/
+
+For the full copyright and license information, please view the LICENSE
+file that was distributed with this source code.
+#}
+{% extends 'default_frame.twig' %}
+
+{% set body_class = 'front_page' %}
+
+{% import('@CustomerReview4/Block/customer_review4_recommend_macro.twig') as recommend_macro %}
+
+{% set CustomerReviewTotalRepository = repository('Plugin\\CustomerReview4\\Entity\\CustomerReviewTotal') %}
+
+{% block stylesheet %}
+    <link rel="stylesheet" href="{{ asset('assets/css/index.css') }}">
+    <style>
+        .rate_container_1E_4T .star {
+            color: #ffbb00;
+        }
+
+        .meta_container_3fLqZ .rate_container_1E_4T .reviewList {
+            margin-left: 5px;
+        }
+
+        .meta_container_3fLqZ .rate_container_1E_4T .reviewList:not(.star) {
+            padding-top: 3px;
+        }
+        
+        .user_container_1_q5p {
+            display: flex;
+            border: 1px solid #d8d8d8;
+            border-radius: 4px;
+            margin-top: 85px;
+            position: relative
+        }
+
+        @media only screen and (max-width: 767px) {
+            .user_container_1_q5p {
+                margin-top:20px
+            }
+        }
+
+        .thumbnail_PhHEN {
+            height: 160px;
+            border-radius: 80px;
+            border: 2px solid #d8d8d8;
+            -o-object-fit: contain;
+            object-fit: contain;
+            position: absolute;
+            top: -35px;
+            left: 20px
+        }
+        
+        @media only screen and (max-width: 767px) {
+            .thumbnail_PhHEN {
+                height:107px;
+                top: -10px;
+                left: 10px
+            }
+        }
+
+        .profile_container_35Ops {
+            display: flex;
+            flex-flow: column;
+            margin-left: 190px
+        }
+        
+        @media only screen and (max-width: 767px) {
+            .profile_container_35Ops {
+                margin-left:0
+            }
+        }
+
+        .profile_container_35Ops .above_oXh0M {
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #d8d8d8;
+            padding: 10px
+        }
+        
+        @media only screen and (max-width: 767px) {
+            .profile_container_35Ops .above_oXh0M {
+                align-items:unset;
+                padding-left: 120px;
+                flex-flow: column
+            }
+        }
+
+        .profile_container_35Ops .above_oXh0M .name__YEZx {
+            -webkit-line-clamp: 2;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            overflow: hidden
+        }
+
+        @media only screen and (max-width: 767px) {
+            .profile_container_35Ops .above_oXh0M .name__YEZx {
+                font-size:20px
+            }
+        }
+
+        .profile_container_35Ops .above_oXh0M .buttons_container_Ii8lZ {
+            display: flex
+        }
+
+        @media only screen and (max-width: 767px) {
+            .profile_container_35Ops .above_oXh0M .buttons_container_Ii8lZ {
+                justify-content:flex-end
+            }
+        }
+
+        .profile_container_35Ops .above_oXh0M .buttons_container_Ii8lZ .setting_icon_26WUt {
+            margin-right: 6px
+        }
+
+        .profile_container_35Ops .below_1KgSI {
+            padding: 10px
+        }
+        
+        .description_2mt1b {
+            margin: 10px 0;
+            min-height: 24px;
+            font-size: 16px;
+        }
+    </style>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $(function() {
+            $('.main_visual').slick({
+                dots: true,
+                arrows: false,
+                autoplay: true,
+                speed: 300
+            });
+        });
+    </script>
+{% endblock javascript %}
+
+{% block main %}
+    <div class="container user_container_1_q5p">
+    <div>
+        <img src="{{ asset(Customer.image|no_image_product, 'save_image') }}" class="thumbnail_PhHEN">
+    </div>
+    <div class="layout profile_container_35Ops">
+        <div class="flex above_oXh0M">
+            <h1 class="name__YEZx"> {{ Customer.nickname }} </h1>
+            <div class="spacer"></div>
+            <div class="buttons_container_Ii8lZ">
+            </div>
+        </div>
+        <div class="layout below_1KgSI">
+            <div class="description_2mt1b"> {{ Customer.description }} </div>
+        </div>
+    </div>
+    </div>
+    <div class="row">
+        {% for blog in blogs %}
+            <div class="col-sm-12 col-md-12 col-lg-6 col-12">
+                <section id="timeline" class="section_3Lm5-">
+                    <a href="{{ url('cm_blog_pro_page_detail', {'id' : blog.id}) }}" class="link_34zqL"></a>
+                    <div class="eyecatch_container_XmM5A">
+                        {% if blog.getMainListImage %}
+                            <img src="{{ asset(blog.getMainListImage|no_image_product, 'save_image') }}" class='eyecatch_3HWWn'></img>
+                            {% else %}
+                            <img src="{{ asset(''|no_image_product, 'save_image') }}" class='eyecatch_3HWWn'></img>
+                        {% endif %}
+                    </div>
+                    <div class="main_container_nNEKD">
+                        <div class="timeline_header_25ozp">
+                            <h3 class="title_3drq2">{{ blog.title|length > 30 ? blog.title|striptags|replace({('&nbsp;'):' '})|slice(0, 30)|raw ~ '...' : blog.title|raw }}</h3>
+                            <p class="body_2FqT0">
+                                {{ blog.body|length > 150 ? blog.body|striptags|replace({('&nbsp;'):' ', ('&rdquo;'):' ', ('&hellip;'):' '})|slice(0, 150)|raw ~ '...' : blog.body|raw }}
+                                {# {{ blog.body|striptags|replace({('&nbsp;'):' ', ('&rdquo;'):' '})|raw }} #}
+                            </p>
+                        </div>
+                        <div class="layout column meta_container_3fLqZ">
+                            <div class="layout meta_items_2sg3D">
+                                <div class="above_container_3dcNQ">
+                                    <div class="price_container_YWERi">{{ blog.price02|price }}</div>
+                                    <div class="sales_count_container_2IHHq">
+                                        部数制限なし
+                                    </div>
+                                </div>
+                                <div class="below_container_2rlxW">
+                                    <div class="affiliate_container_30gzg"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACoAAAA4CAYAAACL3WrLAAAACXBIWXMAABYlAAAWJQFJUiTwAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAGFSURBVHgB7ZntTcMwEIZfUP7TDbgN6AjtJIgNGCFMQDcoXQQYASZo2AAmKGfhoKT1dy+KK90jvWqanN1HsZ2mKaDUDXE2nK3drhLi7DkHmz0qlCWMJauUJbglq5IlhCWrkCWkSc4qSziVNO+3g/cvnhpCAdfIhzhvGH9gx1lzvhz7ukjbJHJFCX7JzlHvOkYokM0RJeRJhmoImbKpoguUSYZqyfa5SGifLPrN2UU+OIarzc72LU6L8Mo1x/sV3npqyPbhOy5GaKhaxEVjfTgpuTxJDFV2HyWis9AMtonzyLlLaPeAvIXUs+Q8J9Z2nCf7OhJtOfeYFjM3Vxn1P/g7eaOhv0V9/I9u4ykwk/0DfkoXlGn3Hqkx0+PkquATNZJryJPSr/m2Wh3vvJhVr6LSqKg0KipNA1laTHSfqUMvjYpKo6LSqKg0KiqNikoTuim5QhkHTIBP1PxkfcU8LF07faK5TzQmZzhHP1EfXb8xPKPmz9YbnP9op3RuH2NO3AaKoiiKCL+Ahnd0hzuIVAAAAABJRU5ErkJggg=="
+                                            class="link_icon_2KHmZ"> 50
+                                        <span class="percentage_14UDW">%</span></div>
+                                    <div class="affiliatable_container_pTftQ">
+                                        全員
+                                    </div>
+
+                                    <div class="rate_container_1E_4T">
+                                        {% set review_list = CustomerReviewTotalRepository.getRecommend(blog.Product.id) %}
+                                        {% set reviewer_total = 0 %}
+                                        {% set review_total_point = 0 %}
+                                        {% set count = 5 %}
+                                        {% for i in review_list %}
+                                            {% set reviewer_total = reviewer_total + i %}
+                                            {% set review_total_point = review_total_point + i * count %}
+                                            {% set count = count - 1 %}
+                                        {% endfor %}
+                                        {% set review_point = reviewer_total == 0 ? 0  : (review_total_point / reviewer_total) %}
+
+                                        {{ recommend_macro.review( review_point, reviewer_total, blog.Product.id ) }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="timeline_footer_2Sj34">
+                            <div class="user_container_Iifui">
+                                <a href="{{ url('customer_detail', { id: Customer.id }) }}" class="user_icon_3YKXP">
+                                    <img src="{{ asset(Customer.image|no_image_product, 'save_image') }}" class="icon_image_1FYIF">
+                                </a>
+                                <div class="user_info_I1_sH">
+                                    <div class="name_1U0BR"> {{ Customer.nickname }} </div>
+                                    <div class="date_wD9kK">
+                                        {% set datePost = blog.create_date|date('d-m-Y') %}
+                                        {% set today = "now"|date('d-m-Y') %}
+                                        {% set difference = date(today).diff(date(datePost))%}
+                                        {% set leftDays = difference.days %}
+                                        {% if datePost == today %}
+                                            今日
+                                        {% else %}
+                                            {{ leftDays }}日前
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="spacer"></div>
+                            
+                            <div class="category_container_183dS">
+                                {% for category in blog.getBlogCategories %}
+                                    <button type="button" class="v-btn v-btn--depressed v-btn--flat v-btn--outlined v-btn--rounded theme--light v-size--small category_button_1C35A">
+                                        <span class="v-btn__content">
+                                            {{ category.getCategory.getName|length > 15 ? category.getCategory.getName|striptags|replace({('&nbsp;'):' '})|slice(0, 15)|raw ~ '...' : category.getCategory.getName|raw }}
+                                        </span>
+                                    </button>
+                                {% endfor %}    
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
